@@ -1,9 +1,9 @@
 {
-  "name": "Visualization Cards",
-  "short_name": "VizCards",
+  "name": "ViBBS – Visualization Building Blocks and Scenarios",
+  "short_name": "ViBBS",
   "description": "Explore and organize different visualization techniques and design patterns with interactive cards",
   "start_url": "./",
-  "display": "standalone",
+  "display": "minimal-ui",
   "orientation": "any",
   "theme_color": "#1f2937",
   "background_color": "#ffffff",
