@@ -9,13 +9,16 @@
     <meta name="theme-color" content="#1f2937">
     <meta name="background-color" content="#ffffff">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="Icon-256.png" type="image/png">
+    <link rel="shortcut icon" href="Icon-256.png" type="image/png">
+    <link rel="mask-icon" href="Icon-256.png" color="#1f2937">
     <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" href="Icon-256.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ViBBS – Visualization Building Blocks and Scenarios">
     <!-- Microsoft Tiles -->
-    <meta name="msapplication-TileImage" content="icons/icon-256.png">
+    <meta name="msapplication-TileImage" content="Icon-256.png">
     <meta name="msapplication-TileColor" content="#1f2937">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,7 +30,7 @@
 </head>
 <body class="font-sans bg-white dark:bg-gray-900 text-black dark:text-white overflow-hidden transition-colors duration-300">
     <!-- PWA Install Banner -->
-    <div id="installBanner" class="fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 flex items-center justify-between z-50 transform -translate-y-full transition-transform duration-300">
+    <div id="installBanner" class="fixed bottom-14 left-0 right-0 bg-blue-600 text-white p-3 flex items-center justify-between z-50 transform translate-y-full transition-transform duration-300">
         <div class="flex items-center gap-3">
             <i class="fas fa-download"></i>
             <span class="text-sm font-medium">Install ViBBS – Visualization Building Blocks and Scenarios for offline access</span>
@@ -44,11 +47,26 @@
     <!-- Header -->
     <div class="text-center border-b border-gray-300 dark:border-gray-600">
         <div class="flex items-center justify-between pl-4 pr-4 py-3 bg-gray-50 dark:bg-gray-800">
-            <div class="flex flex-col text-left gap-0">
-                <h1 class="text-xl font-semibold">ViBBS</h1>
-                <h4 class="text-sm text-gray-600 dark:text-gray-400">Visualization Building Blocks and Scenarios</h4>
+            <div class="flex items-center gap-3">
+                <img src="Icon-256.png" alt="ViBBS Logo" class="w-10 h-10">
+                <div class="flex flex-col text-left gap-0">
+                    <h1 class="text-xl font-semibold">ViBBS</h1>
+                    <h4 class="text-sm text-gray-600 dark:text-gray-400">Visualization Building Blocks and Scenarios</h4>
+                </div>
             </div>
             <div class="flex gap-2">
+                <!-- Desktop Segmented Control -->
+                <div class="hidden md:flex justify-center bg-gray-50 dark:bg-gray-800">
+                    <div class="bg-gray-200 dark:bg-gray-700 p-1 mr-1 rounded-lg flex">
+                        <button class="flex inline gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm">
+                            <svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M51.8 160.4c-3.7 2.1-4.9 6.8-2.8 10.5l167 289.3c2.1 3.7 6.8 4.9 10.5 2.8L419.4 351.6c3.7-2.1 4.9-6.8 2.8-10.5L255.2 51.8c-2.1-3.7-6.8-4.9-10.5-2.8L51.8 160.4zM7.5 194.9c-15.4-26.6-6.3-60.7 20.4-76.1L220.7 7.5c26.6-15.4 60.7-6.3 76.1 20.4l167 289.3c15.4 26.6 6.2 60.7-20.4 76.1L250.5 504.5c-26.6 15.4-60.7 6.2-76.1-20.4L7.5 194.9zm451.9 226c41.9-24.2 56.3-77.8 32.1-119.8L354.7 64.2c1.7-.2 3.5-.2 5.3-.2l224 0c30.9 0 56 25.1 56 56l0 336c0 30.9-25.1 56-56 56l-224 0c-13.7 0-26.2-4.9-35.9-13l135.3-78.1z"/></svg>Cards
+                        </button>
+                        <button class="flex inline gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" 
+                                onclick="navigateToScenarios()">
+                                <svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M374.8 80.3C355.9 33.2 309.8 0 256 0s-99.9 33.2-118.8 80.3c-3-.2-6.1-.3-9.2-.3C57.3 80 0 137.3 0 208s57.3 128 128 128c14.4 0 28.3-2.4 41.3-6.8C184.7 361.6 217.7 384 256 384s71.3-22.4 86.7-54.8c12.9 4.4 26.8 6.8 41.3 6.8c70.7 0 128-57.3 128-128s-57.3-128-128-128c-3.1 0-6.1 .1-9.2 .3zM144 480a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM32 512a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>Scenarios
+                        </button>
+                    </div>
+                </div>
                 <!-- PWA Status Indicator -->
                 <div id="pwaStatus" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200" title="PWA Status">
                     <i class="fas fa-wifi text-sm" id="statusIcon"></i>
@@ -66,7 +84,7 @@
     </div>
     <!-- Main Container -->
     <div class="h-screen flex flex-col" style="height: calc(100vh - 120px);">
-        <div class="flex-1 overflow-y-scroll">
+        <div class="flex-1 overflow-y-scroll mt-16 md:mt-0">
             <div class="h-full flex flex-row" id="decksContainer">
                 <!-- Decks will be generated by JavaScript -->
             </div>
@@ -185,6 +203,18 @@
             </div>
         </div>
     </div>
+    <!-- Mobile Top Segmented Control -->
+    <div class="md:hidden fixed top-[70px] w-full pl-4 pr-2 flex justify-center bg-gray-50 dark:bg-gray-800">
+        <div class="bg-gray-200 dark:bg-gray-700 p-1 mr-1 rounded-lg flex mb-3 flex-1">
+            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm">
+                <div class="flex flex-col items-center"><svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M51.8 160.4c-3.7 2.1-4.9 6.8-2.8 10.5l167 289.3c2.1 3.7 6.8 4.9 10.5 2.8L419.4 351.6c3.7-2.1 4.9-6.8 2.8-10.5L255.2 51.8c-2.1-3.7-6.8-4.9-10.5-2.8L51.8 160.4zM7.5 194.9c-15.4-26.6-6.3-60.7 20.4-76.1L220.7 7.5c26.6-15.4 60.7-6.3 76.1 20.4l167 289.3c15.4 26.6 6.2 60.7-20.4 76.1L250.5 504.5c-26.6 15.4-60.7 6.2-76.1-20.4L7.5 194.9zm451.9 226c41.9-24.2 56.3-77.8 32.1-119.8L354.7 64.2c1.7-.2 3.5-.2 5.3-.2l224 0c30.9 0 56 25.1 56 56l0 336c0 30.9-25.1 56-56 56l-224 0c-13.7 0-26.2-4.9-35.9-13l135.3-78.1z"/></svg>Cards</div>
+            </button>
+            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" 
+                    onclick="navigateToScenarios()">
+                    <div class="flex flex-col items-center"><svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M374.8 80.3C355.9 33.2 309.8 0 256 0s-99.9 33.2-118.8 80.3c-3-.2-6.1-.3-9.2-.3C57.3 80 0 137.3 0 208s57.3 128 128 128c14.4 0 28.3-2.4 41.3-6.8C184.7 361.6 217.7 384 256 384s71.3-22.4 86.7-54.8c12.9 4.4 26.8 6.8 41.3 6.8c70.7 0 128-57.3 128-128s-57.3-128-128-128c-3.1 0-6.1 .1-9.2 .3zM144 480a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM32 512a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>Scenarios</div>
+            </button>
+        </div>
+    </div>
     <script>
         // PWA variables
         let deferredPrompt;
@@ -227,7 +257,7 @@
         // Hide install banner
         function hideInstallBanner() {
             const banner = document.getElementById('installBanner');
-            banner.style.transform = 'translateY(-100%)';
+            banner.style.transform = 'translateY(100%)';
         }
         // Install button handler
         document.getElementById('installButton').addEventListener('click', async () => {
@@ -293,6 +323,10 @@
         function toggleDarkMode() {
             darkMode = !darkMode;
             applyDarkMode();
+        }
+        // Navigate to scenarios page
+        function navigateToScenarios() {
+            window.location.href = 'scenarios.html';
         }
         // Card data structure based on actual files
         const cardData = {

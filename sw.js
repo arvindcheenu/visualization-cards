@@ -8,7 +8,8 @@ const FILES_TO_CACHE = [
   './manifest.json',
   './sw.js',
   'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js',
 ];
 // Install event - cache core files
 self.addEventListener('install', (event) => {
