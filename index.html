@@ -53,6 +53,7 @@
             transform-style: preserve-3d;
         }
         [id^="card-"]:hover {
+            filter: brightness(1.01) contrast(1.05) saturate(1.05);
             transition: none; /* Let vanilla-tilt handle all transforms */
         }
     </style>
@@ -262,21 +263,26 @@
     <script type="module">
         // Import PhotoSwipe
         import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.js';
+        
+        // Import configurations
+        import { decks as deckConfig } from './deck.js';
+        
         // Global variables
         let currentView = 'cards'; // 'cards' or 'scenarios'
         let lightbox;
         let cardData = {};
         let decks = [];
-        let deckConfig = {};
         let deckConfigFromFile = {}; 
         let pinnedCards = [];
         let hidePinnedStates = [];
         let activeFilter = 'all';
         let isDesktop = false;
+        
         // Check if device is desktop (not mobile/tablet)
         function checkIfDesktop() {
             isDesktop = window.innerWidth >= 1024 && !('ontouchstart' in window || navigator.maxTouchPoints > 0);
         }
+        
         // Initialize tilt effect for cards (desktop only)
         function initTiltForCards(selector = '[id^="card-"]') {
             if (!isDesktop) return;
@@ -290,7 +296,7 @@
                         max: 8,              // Maximum tilt (degrees)
                         speed: 1000,         // Speed of tilt animation (higher = slower)
                         glare: true,         // Enable glare effect
-                        "max-glare": 0.55,   // Maximum glare opacity
+                        "max-glare": 0.5,   // Maximum glare opacity
                         perspective: 1000,   // Transform perspective
                         scale: 1.02,         // Scale on hover
                         transition: false,   // Disable CSS transitions for smoother movement
@@ -303,6 +309,7 @@
                 });
             }, 100);
         }
+        
         // Initialize tilt for pinned cards in drawer
         function initTiltForPinnedCards() {
             if (!isDesktop) return;
@@ -327,6 +334,7 @@
                 });
             }, 150);
         }
+        
         // Destroy tilt instances for cards that are being updated
         function destroyTiltForCards(selector) {
             const cards = document.querySelectorAll(selector);
@@ -336,6 +344,7 @@
                 }
             });
         }
+        
         function makeColorScheme(color) {
             let colorScheme = {}
             colorScheme.color = color;
@@ -346,25 +355,30 @@
             colorScheme.activePillHover = `hover:bg-${color}-700`;
             return colorScheme;
         }
+        
         const defaultColorSchemes = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose', 'slate', 'gray', 'zinc', 'neutral', 'stone'].map(color => makeColorScheme(color));
+        
         // Switch to Cards view
         window.switchToCards = function() {
             currentView = 'cards';
             updateTabState();
             showCardsView();
         }
+        
         // Switch to Scenarios view
         window.switchToScenarios = function() {
             currentView = 'scenarios';
             updateTabState();
             showScenariosView();
         }
+        
         // Update tab state
         function updateTabState() {
             const cardsTabButton = document.getElementById('cardsTabButton');
             const scenariosTabButton = document.getElementById('scenariosTabButton');
             const cardsTabButtonMobile = document.getElementById('cardsTabButtonMobile');
             const scenariosTabButtonMobile = document.getElementById('scenariosTabButtonMobile');
+            
             if (currentView === 'cards') {
                 // Desktop tabs
                 cardsTabButton.className = 'flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-blue-600 shadow-sm';
@@ -381,6 +395,7 @@
                 scenariosTabButtonMobile.className = 'flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-teal-600 shadow-sm';
             }
         }
+        
         // Show Cards view
         function showCardsView() {
             document.getElementById('cardsView').classList.remove('hidden');
@@ -389,6 +404,7 @@
             // Reinitialize tilt effects for cards that might have been rendered
             initTiltForCards();
         }
+        
         // Show Scenarios view
         function showScenariosView() {
             document.getElementById('cardsView').classList.add('hidden');
@@ -399,6 +415,7 @@
                 loadScenarios();
             }
         }
+        
         // Initialize PhotoSwipe
         function initPhotoSwipe() {
             if (lightbox) {
@@ -411,26 +428,8 @@
             });
             lightbox.init();
         }
-        // Fetch scenario images
-        async function fetchScenarioImages() {
-            try {
-                const response = await fetch('scenarios/');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
-                const images = Array.from(doc.querySelectorAll('a'))
-                    .map(a => a.getAttribute('href'))
-                    .filter(href => href && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg')))
-                    .sort((a, b) => a.localeCompare(b))
-                    .map(href => href.replace(/scenarios\//, ''));
-                return images;
-            } catch (error) {
-                console.error('Error fetching scenario images:', error);
-                return [];
-            }
-        }
-        // Load scenarios
+        
+        // Load scenarios from scenarios/index.js
         async function loadScenarios() {
             const grid = document.getElementById('scenariosGallery');
             grid.innerHTML = `
@@ -441,73 +440,81 @@
                     </div>
                 </div>
             `;
-            const imagePaths = await fetchScenarioImages();
-            if (imagePaths.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No scenario images found in the scenarios folder.</div>';
-                return;
-            }
-            const imagePromises = imagePaths.map((imagePath, index) => {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = function() {
-                        const scenarioCard = document.createElement('a');
-                        scenarioCard.href = `scenarios/${imagePath}`;
-                        scenarioCard.className = 'scenario-card';
-                        scenarioCard.setAttribute('data-pswp-width', this.naturalWidth);
-                        scenarioCard.setAttribute('data-pswp-height', this.naturalHeight);
-                        scenarioCard.setAttribute('target', '_blank');
-                        scenarioCard.setAttribute('data-scenario-index', index);
-                        scenarioCard.innerHTML = `<img src="scenarios/${imagePath}" alt="Scenario ${imagePath}" loading="lazy">`;
-                        resolve({ element: scenarioCard, index });
-                    };
-                    img.onerror = function() {
-                        console.error(`Failed to load image: ${imagePath}`);
-                        reject(new Error(`Failed to load image: ${imagePath}`));
-                    };
-                    img.src = `scenarios/${imagePath}`;
-                });
-            });
+            
             try {
+                // Import scenarios from scenarios/index.js
+                const { files } = await import('./scenarios/index.js');
+                
+                if (!files || files.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No scenario images found. Run the generation script to populate scenarios/index.js.</div>';
+                    return;
+                }
+                
+                const imagePromises = files.map((filename, index) => {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = function() {
+                            const scenarioCard = document.createElement('a');
+                            scenarioCard.href = `scenarios/${filename}`;
+                            scenarioCard.className = 'scenario-card';
+                            scenarioCard.setAttribute('data-pswp-width', this.naturalWidth);
+                            scenarioCard.setAttribute('data-pswp-height', this.naturalHeight);
+                            scenarioCard.setAttribute('target', '_blank');
+                            scenarioCard.setAttribute('data-scenario-index', index);
+                            scenarioCard.innerHTML = `<img src="scenarios/${filename}" alt="Scenario ${filename}" loading="lazy">`;
+                            resolve({ element: scenarioCard, index });
+                        };
+                        img.onerror = function() {
+                            console.error(`Failed to load image: ${filename}`);
+                            reject(new Error(`Failed to load image: ${filename}`));
+                        };
+                        img.src = `scenarios/${filename}`;
+                    });
+                });
+                
                 const results = await Promise.allSettled(imagePromises);
                 const successfulResults = results
                     .filter(result => result.status === 'fulfilled')
                     .map(result => result.value)
                     .sort((a, b) => a.index - b.index);
+                
                 if (successfulResults.length === 0) {
                     grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Failed to load any scenario images.</div>';
                     return;
                 }
+                
                 grid.innerHTML = '';
                 successfulResults.forEach(({ element }) => {
                     grid.appendChild(element);
                 });
+                
                 attachHoverEffectToScenarioCards();
                 initPhotoSwipe();
+                
             } catch (error) {
                 console.error('Error loading scenarios:', error);
-                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Error loading scenario images.</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Error loading scenarios. Make sure scenarios/index.js exists and is properly formatted.</div>';
             }
         }
-        // === CARDS FUNCTIONALITY (from original file) ===
-        // Load deck configuration from deck.json
-        async function loadDeckConfig() {
+        
+        // === CARDS FUNCTIONALITY ===
+        
+        // Load deck configuration
+        function loadDeckConfig() {
             try {
-                const response = await fetch('./deck.json');
-                if (response.ok) {
-                    const config = await response.json();
-                    if (config.decks && Array.isArray(config.decks)) {
-                        deckConfigFromFile = {};
-                        config.decks.forEach(deck => {
-                            deckConfigFromFile[deck.id] = deck;
-                        });
-                        return true;
-                    }
+                if (deckConfig && Array.isArray(deckConfig)) {
+                    deckConfigFromFile = {};
+                    deckConfig.forEach(deck => {
+                        deckConfigFromFile[deck.id] = deck;
+                    });
+                    return true;
                 }
             } catch (error) {
-                console.error('Could not load deck.json, using default configuration:', error);
+                console.error('Could not load deck configuration:', error);
             }
             return false;
         }
+        
         // Get color scheme for a color name
         function getColorScheme(colorName) {
             const colorSchemes = defaultColorSchemes.reduce((acc, color) => {
@@ -516,6 +523,7 @@
             }, {});
             return colorSchemes[colorName.toLowerCase()] || colorSchemes.blue;
         }
+        
         // Hide loading indicator
         function hideLoadingIndicator() {
             const indicator = document.getElementById('loadingIndicator');
@@ -523,12 +531,14 @@
                 indicator.style.display = 'none';
             }
         }
+        
         // Format deck name for display
         function formatDeckName(deckName) {
             return deckName.replace('/cards/','').split('-').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         }
+        
         // Parse filename to extract deck and card names
         function parseFilename(filename) {
             const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
@@ -540,49 +550,20 @@
             const cardName = nameWithoutExt.substring(underscoreIndex + 1);
             return { deckName, cardName };
         }
-        // Try to discover cards from directory listing
-        async function tryDirectoryListing() {
+        
+        // Load cards from cards/index.js
+        async function loadCards() {
             try {
-                const response = await fetch('cards/');
-                if (!response.ok) {
-                    return null;
+                // Import cards from cards/index.js
+                const { files } = await import('./cards/index.js');
+                
+                if (!files || files.length === 0) {
+                    showNoCardsMessage();
+                    return;
                 }
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = doc.querySelectorAll('a[href]');
-                const filenames = [];
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href && href.endsWith('.png') && href.includes('_')) {
-                        filenames.push(href);
-                    }
-                });
-                if (filenames.length === 0) {
-                    const preElements = doc.querySelectorAll('pre');
-                    preElements.forEach(pre => {
-                        const text = pre.textContent || pre.innerText;
-                        const lines = text.split('\n');
-                        lines.forEach(line => {
-                            const match = line.match(/([a-zA-Z0-9_-]+\.png)/);
-                            if (match && match[1].includes('_')) {
-                                filenames.push(match[1]);
-                            }
-                        });
-                    });
-                }
-                return filenames.length > 0 ? filenames : null;
-            } catch (error) {
-                console.error('Directory listing not available:', error);
-                return null;
-            }
-        }
-        // Discover cards from server
-        async function discoverCards() {
-            const filenames = await tryDirectoryListing();
-            if (filenames) {
+                
                 cardData = {};
-                filenames.forEach(filename => {
+                files.forEach(filename => {
                     const parsed = parseFilename(filename);
                     if (parsed) {
                         if (!cardData[parsed.deckName]) {
@@ -591,20 +572,26 @@
                         cardData[parsed.deckName].push(parsed.cardName);
                     }
                 });
+                
                 generateDeckConfigFromCardData();
                 buildDecksFromCardData();
-                return;
+                
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                showErrorMessage('Error loading cards. Make sure cards/index.js exists and is properly formatted.');
             }
         }
+        
         // Generate deck configuration from discovered card data
         function generateDeckConfigFromCardData() {
-            deckConfig = {};
+            deckConfigFromFile = deckConfigFromFile || {};
             const deckNames = Object.keys(cardData);
             deckNames.forEach((deckName, index) => {
                 const configFromFile = deckConfigFromFile[deckName.replace('cards/', '').replace('/', '')];
                 let colorScheme;
                 let title;
                 let description;
+                
                 if (configFromFile) {
                     colorScheme = getColorScheme(configFromFile.color);
                     title = configFromFile.title;
@@ -614,7 +601,8 @@
                     title = formatDeckName(deckName);
                     description = `Cards in the ${title} category.`;
                 }
-                deckConfig[deckName] = {
+                
+                deckConfigFromFile[deckName] = {
                     title: title,
                     description: description,
                     order: configFromFile ? configFromFile.order : index + 1,
@@ -622,20 +610,24 @@
                 };
             });
         }
+        
         // Build decks structure from discovered card data
         function buildDecksFromCardData() {
             decks = [];
             hidePinnedStates = [];
+            
             const deckEntries = Object.keys(cardData).map(deckKey => ({
                 key: deckKey,
-                config: deckConfig[deckKey],
+                config: deckConfigFromFile[deckKey],
                 cards: cardData[deckKey]
             }));
+            
             deckEntries.sort((a, b) => {
                 const orderA = a.config.order || 999;
                 const orderB = b.config.order || 999;
                 return orderA - orderB;
             });
+            
             deckEntries.forEach(entry => {
                 if (entry.cards.length > 0) {
                     decks.push({
@@ -647,10 +639,12 @@
                     hidePinnedStates.push(false);
                 }
             });
+            
             const loadingMessage = document.getElementById('loadingMessage');
             if (loadingMessage) {
                 loadingMessage.style.display = 'none';
             }
+            
             if (decks.length === 0) {
                 showNoCardsMessage();
             } else {
@@ -664,10 +658,12 @@
             }
             hideLoadingIndicator();
         }
+        
         // Update info modal with categories from configuration
         function updateInfoModalCategories() {
             const container = document.getElementById('categoryDescriptions');
             let categoriesHTML = '';
+            
             decks.forEach(deck => {
                 const colorClass = `bg-${deck.color}-600`;
                 categoriesHTML += `
@@ -680,8 +676,10 @@
                     </div>
                 `;
             });
+            
             container.innerHTML = categoriesHTML;
         }
+        
         // Show message when no cards are found
         function showNoCardsMessage() {
             const container = document.getElementById('cardsContent');
@@ -689,11 +687,12 @@
                 <div class="flex-1 flex items-center justify-center text-gray-500">
                     <div class="text-center max-w-md">
                         <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-                        <p class="mb-4">No cards found in the cards folder.</p>
+                        <p class="mb-4">No cards found.</p>
                         <div class="text-sm space-y-2">
-                            <p>Add card files using the naming pattern:</p>
-                            <div class="bg-gray-100 p-3 rounded">
-                                <code>deck-name_card-name.png</code>
+                            <p>Make sure to:</p>
+                            <div class="bg-gray-100 p-3 rounded text-left">
+                                <p>1. Add card files using the pattern: <code>deck-name_card-name.png</code></p>
+                                <p>2. Run the generation script to create <code>cards/index.js</code></p>
                             </div>
                             <div class="text-xs text-gray-400 mt-3">
                                 Examples:<br>
@@ -706,11 +705,27 @@
                 </div>
             `;
         }
+        
+        // Show error message
+        function showErrorMessage(message) {
+            const container = document.getElementById('cardsContent');
+            container.innerHTML = `
+                <div class="flex-1 flex items-center justify-center text-gray-500">
+                    <div class="text-center max-w-md">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p class="mb-4">${message}</p>
+                    </div>
+                </div>
+            `;
+            hideLoadingIndicator();
+        }
+        
         // Load data from localStorage
         function loadData() {
             const savedPinnedCards = localStorage.getItem('pinnedCards');
             const savedHidePinnedStates = localStorage.getItem('hidePinnedStates');
             const savedActiveFilter = localStorage.getItem('activeFilter');
+            
             if (savedPinnedCards) {
                 pinnedCards = JSON.parse(savedPinnedCards);
             }
@@ -721,35 +736,42 @@
                 activeFilter = savedActiveFilter;
             }
         }
+        
         // Save data to localStorage
         function saveData() {
             localStorage.setItem('pinnedCards', JSON.stringify(pinnedCards));
             localStorage.setItem('hidePinnedStates', JSON.stringify(hidePinnedStates));
             localStorage.setItem('activeFilter', activeFilter);
         }
+        
         // Initialize the application
         async function init() {
             checkIfDesktop();
             loadData();
-            await loadDeckConfig();
-            await discoverCards();
+            loadDeckConfig();
+            await loadCards();
             updateTabState();
         }
+        
         // Render all decks
         function renderDecks() {
             const container = document.getElementById('cardsContent');
             container.innerHTML = '';
+            
             decks.forEach((deck, deckIndex) => {
                 const deckElement = createDeckElement(deck, deckIndex);
                 container.appendChild(deckElement);
             });
         }
+        
         // Create a deck element
         function createDeckElement(deck, deckIndex) {
             const deckDiv = document.createElement('div');
             deckDiv.className = `flex-1 flex flex-col min-h-0 ${deck.bgColor}`;
             deckDiv.id = `deck-${deckIndex}`;
+            
             const visibleCardCount = getVisibleCardCount(deckIndex);
+            
             deckDiv.innerHTML = `
                 <div class="flex justify-between items-center border-b ${deck.headerBgColor} flex-shrink-0">
                     <h3 class="font-semibold p-4">
@@ -769,8 +791,10 @@
                     </div>
                 </div>
             `;
+            
             return deckDiv;
         }
+        
         // Get count of visible cards in a deck
         function getVisibleCardCount(deckIndex) {
             let count = 0;
@@ -782,12 +806,14 @@
             }
             return count;
         }
+        
         // Format card name for display
         function formatCardName(cardName) {
             return cardName.split('-').map(word => 
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         }
+        
         // Get border color for card image based on deck and pin status
         function getCardImageBorderColor(deckIndex, isPinned) {
             if (isPinned) {
@@ -795,23 +821,27 @@
             }
             return decks[deckIndex].borderColor;
         }
+        
         // Generate cards for a deck
         function generateCards(deck, deckIndex) {
             let cardsHTML = '';
             let hasVisibleCard = false;
+            
             for (let i = 0; i < deck.cards.length; i++) {
                 const cardId = `${deckIndex}-${i}`;
                 const cardName = deck.cards[i];
-                const imagePath = `${deck.key}_${cardName}.png`;
+                const imagePath = `cards/${deck.key}_${cardName}.png`;
                 const displayName = formatCardName(cardName);
                 const isPinned = pinnedCards.some(card => card.id === cardId);
                 const shouldHide = hidePinnedStates[deckIndex] && isPinned;
+                
                 if (!shouldHide) {
                     hasVisibleCard = true;
                     const imageBorderColor = getCardImageBorderColor(deckIndex, isPinned);
                     const shadowClass = isPinned ? 'shadow-lg shadow-gray-400' : 'hover:shadow-md hover:shadow-gray-400';
                     const bgClass = isPinned ? 'bg-blue-50' : 'bg-white';
                     const deckColor = decks[deckIndex].color;
+                    
                     cardsHTML += `
                         <div class="w-[300px] ${bgClass} ${shadowClass} rounded-lg transition-all duration-200 cursor-pointer" 
                              id="card-${cardId}"
@@ -832,12 +862,15 @@
                     `;
                 }
             }
+            
             return hasVisibleCard ? cardsHTML : 
                 '<div class="w-[300px] bg-white rounded-lg"><div class="w-full bg-gray-100 border border-gray-200 border-4 flex items-center justify-center text-gray-600 p-4 rounded-lg">All cards are pinned</div></div>';
         }
+        
         // Toggle pin status of a card
         window.togglePin = function(cardId, deckIndex, cardIndex) {
             const existingIndex = pinnedCards.findIndex(card => card.id === cardId);
+            
             if (existingIndex !== -1) {
                 pinnedCards.splice(existingIndex, 1);
             } else {
@@ -850,11 +883,12 @@
                     title: deck.title,
                     cardName: cardName,
                     displayName: formatCardName(cardName),
-                    imagePath: `${deck.key}_${cardName}.png`,
+                    imagePath: `cards/${deck.key}_${cardName}.png`,
                     cardNumber: cardIndex + 1,
                     totalCards: deck.cards.length
                 });
             }
+            
             updateSpecificCard(cardId, deckIndex, cardIndex);
             updateDeckCardCount(deckIndex);
             updateFilterPills();
@@ -862,20 +896,24 @@
             updatePinnedCount();
             saveData();
         }
+        
         // Update only a specific card
         function updateSpecificCard(cardId, deckIndex, cardIndex) {
             const cardElement = document.getElementById(`card-${cardId}`);
             if (!cardElement) return;
+            
             // Destroy existing tilt before updating
             if (cardElement.vanillaTilt) {
                 cardElement.vanillaTilt.destroy();
             }
+            
             const isPinned = pinnedCards.some(card => card.id === cardId);
             const button = cardElement.querySelector('button');
             const icon = button.querySelector('i');
             const imageContainer = cardElement.querySelector('div > div');
             const imageBorderColor = getCardImageBorderColor(deckIndex, isPinned);
             const deckColor = decks[deckIndex].color;
+            
             if (isPinned) {
                 cardElement.className = `w-[300px] bg-blue-50 shadow-lg shadow-gray-400 rounded-lg transition-all duration-200 cursor-pointer`;
                 button.className = `absolute border border-2 border-${deckColor}-900 top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center bg-${deckColor}-600 hover:bg-${deckColor}-700 z-10 transition-colors duration-200`;
@@ -887,11 +925,13 @@
                 icon.className = 'fas fa-thumbtack';
                 imageContainer.className = `w-full rounded-lg bg-gray-100 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 overflow-hidden relative`;
             }
+            
             if (hidePinnedStates[deckIndex] && isPinned) {
                 cardElement.style.display = 'none';
             } else {
                 cardElement.style.display = 'block';
             }
+            
             // Reinitialize tilt for this specific card
             if (isDesktop && cardElement.style.display !== 'none') {
                 setTimeout(() => {
@@ -912,6 +952,7 @@
                 }, 50);
             }
         }
+        
         // Update deck card count
         function updateDeckCardCount(deckIndex) {
             const countElement = document.getElementById(`count-${deckIndex}`);
@@ -919,22 +960,28 @@
                 countElement.textContent = getVisibleCardCount(deckIndex);
             }
         }
+        
         // Toggle hide pinned state
         window.toggleHidePinned = function(deckIndex) {
             hidePinnedStates[deckIndex] = !hidePinnedStates[deckIndex];
+            
             const icon = document.getElementById(`hideIcon-${deckIndex}`);
             const text = document.getElementById(`hideText-${deckIndex}`);
+            
             if (icon && text) {
                 icon.className = `fas ${hidePinnedStates[deckIndex] ? 'fa-eye' : 'fa-eye-slash'}`;
                 text.textContent = hidePinnedStates[deckIndex] ? 'Show Pinned' : 'Hide Pinned';
             }
+            
             for (let i = 0; i < decks[deckIndex].cards.length; i++) {
                 const cardId = `${deckIndex}-${i}`;
                 updateSpecificCard(cardId, deckIndex, i);
             }
+            
             updateDeckCardCount(deckIndex);
             saveData();
         }
+        
         // Update filter pills
         function updateFilterPills() {
             const container = document.getElementById('filterPills');
@@ -942,12 +989,14 @@
                 return pinnedCards.filter(card => card.deckIndex === index).length;
             });
             const totalCount = pinnedCards.length;
+            
             let pillsHTML = `
                 <button class="text-sm border border-gray-300 ${activeFilter === 'all' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-50 hover:bg-gray-100'} px-2 pl-4 py-2 rounded-full transition-colors duration-200" 
                         onclick="setFilter('all')">
                     All<span class="ml-2 px-2 py-1 text-xs ${activeFilter === 'all' ? 'bg-blue-300 bg-opacity-30' : 'bg-black bg-opacity-20'} rounded-full">${totalCount}</span>
                 </button>
             `;
+            
             decks.forEach((deck, index) => {
                 const colorClass = `bg-${deck.color}-300`;
                 if (deckCounts[index] > 0) {
@@ -961,8 +1010,10 @@
                     `;
                 }
             });
+            
             container.innerHTML = pillsHTML;
         }
+        
         // Set active filter
         window.setFilter = function(filter) {
             activeFilter = filter;
@@ -970,11 +1021,14 @@
             updatePinnedCardsDisplay();
             saveData();
         }
+        
         // Update pinned cards display
         function updatePinnedCardsDisplay() {
             const container = document.getElementById('pinnedCards');
+            
             // Destroy existing tilt instances
             destroyTiltForCards('#pinnedCards > div[onclick]');
+            
             if (pinnedCards.length === 0) {
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-48 text-gray-500 text-center min-w-full">
@@ -985,13 +1039,16 @@
                 `;
                 return;
             }
+            
             const filteredCards = activeFilter === 'all' 
                 ? pinnedCards 
                 : pinnedCards.filter(card => card.deckIndex.toString() === activeFilter);
+            
             if (filteredCards.length === 0) {
                 container.innerHTML = '<div class="flex items-center justify-center h-48 text-gray-500 text-center min-w-full">No cards match the selected filter.</div>';
                 return;
             }
+            
             const cardsHTML = filteredCards.map(card => `
                 <div class="first:ml-4 last:mr-4 mt-4 w-[250px] h-fit bg-blue-50 shadow-none cursor-not-allowed rounded-lg flex-shrink-0 transition-all duration-200 cursor-pointer"
                      onclick="togglePin('${card.id}', ${card.deckIndex}, ${card.cardIndex})">
@@ -1009,38 +1066,47 @@
                     </div>
                 </div>
             `).join('');
+            
             container.innerHTML = cardsHTML;
+            
             // Initialize tilt for newly created pinned cards
             initTiltForPinnedCards();
         }
+        
         // Update pinned count
         function updatePinnedCount() {
             document.getElementById('pinnedCount').textContent = pinnedCards.length;
         }
+        
         // Toggle drawer
         window.toggleDrawer = function() {
             const drawer = document.getElementById('drawer');
             const button = drawer.querySelector('button i');
             const isOpen = drawer.style.transform === 'translateY(0px)';
+            
             drawer.style.transform = isOpen ? 'translateY(calc(100% - 48px))' : 'translateY(0px)';
             button.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         }
+        
         // Open info modal
         window.openInfoModal = function() {
             document.getElementById('infoModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
+        
         // Close info modal
         window.closeInfoModal = function() {
             document.getElementById('infoModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
+        
         // Close modal on Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeInfoModal();
             }
         });
+        
         // Handle window resize to recheck desktop status
         window.addEventListener('resize', function() {
             const wasDesktop = isDesktop;
@@ -1057,6 +1123,7 @@
                 }
             }
         });
+        
         function attachHoverEffectToScenarioCards() {
             document.querySelectorAll('.scenario-card').forEach(card => {
                 card.addEventListener('mouseover', function() {
@@ -1067,6 +1134,7 @@
                 });
             });
         }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', init);
     </script>
