@@ -1,5 +1,5 @@
-// Auto-generated file - do not edit manually
-// Last generated: 2025-07-16T18:55:11Z
+// Auto-generated file - edit to add filenames manually at your own risk
+// Last generated: 2025-07-16T19:30:06Z
 
 export const files = [
   "scenario-1.png",
@@ -14,4 +14,4 @@ export const files = [
   "scenario-9.png",
 ];
 
-export const lastGenerated = "2025-07-16T18:55:11Z";
+export const lastGenerated = "2025-07-16T19:30:06Z";

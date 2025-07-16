@@ -10,7 +10,7 @@ generate_cards() {
         return 1
     fi
     # Create the index.js file
-    echo "// Auto-generated file - do not edit manually" > "$OUTPUT_FILE"
+    echo "// Auto-generated file - edit to add filenames manually at your own risk" > "$OUTPUT_FILE"
     echo "// Last generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$OUTPUT_FILE"
     echo "" >> "$OUTPUT_FILE"
     echo "export const files = [" >> "$OUTPUT_FILE"
@@ -37,7 +37,7 @@ generate_scenarios() {
         return 1
     fi
     # Create the index.js file
-    echo "// Auto-generated file - do not edit manually" > "$OUTPUT_FILE"
+    echo "// Auto-generated file - edit to add filenames manually at your own risk" > "$OUTPUT_FILE"
     echo "// Last generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$OUTPUT_FILE"
     echo "" >> "$OUTPUT_FILE"
     echo "export const files = [" >> "$OUTPUT_FILE"

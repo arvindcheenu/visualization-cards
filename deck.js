@@ -1,6 +1,3 @@
-// Deck configuration for ViBBS
-// Converted from deck.json to ES module format
-
 export const decks = [
   {
     "id": "visualization",

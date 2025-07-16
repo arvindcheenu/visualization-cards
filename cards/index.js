@@ -1,5 +1,5 @@
-// Auto-generated file - do not edit manually
-// Last generated: 2025-07-16T18:55:10Z
+// Auto-generated file - edit to add filenames manually at your own risk
+// Last generated: 2025-07-16T19:30:06Z
 
 export const files = [
   "interaction_brushing-and-linking.png",
@@ -69,4 +69,4 @@ export const files = [
   "visualization_violin-plot.png",
 ];
 
-export const lastGenerated = "2025-07-16T18:55:11Z";
+export const lastGenerated = "2025-07-16T19:30:06Z";
