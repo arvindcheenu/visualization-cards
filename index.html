@@ -3,79 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="icon.png" type="image/png">
     <title>ViBBS – Visualization Building Blocks and Scenarios</title>
-    <!-- PWA Meta Tags -->
     <meta name="description" content="Explore and organize different visualization techniques and design patterns with interactive cards">
-    <meta name="theme-color" content="#1f2937">
-    <meta name="background-color" content="#ffffff">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="Icon-256.png" type="image/png">
-    <link rel="shortcut icon" href="Icon-256.png" type="image/png">
-    <link rel="mask-icon" href="Icon-256.png" color="#1f2937">
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="Icon-256.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ViBBS – Visualization Building Blocks and Scenarios">
-    <!-- Microsoft Tiles -->
-    <meta name="msapplication-TileImage" content="Icon-256.png">
-    <meta name="msapplication-TileColor" content="#1f2937">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/photoswipe@5/dist/photoswipe.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <style>
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            padding-bottom: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            margin-bottom: 3.5rem;
+            width: 100%;
+        }
+        .scenario-card {
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 5px solid rgb(28, 28, 28);
+            transition: all 0.2s ease;
+        }
+        .scenario-card:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-color: rgb(0, 139, 154);
+            filter: hue-rotate(-10deg) brightness(1.05) contrast(1.05);
+        }
+        .scenario-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .pswp {
+            z-index: 9999;
+        }
+        /* Tilt.js styles for enhanced effects */
+        .js-tilt-glare-inner {
+            background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 100%);
+        }
+        /* Ensure smooth tilt by preventing conflicting transitions on card containers */
+        [id^="card-"] {
+            transform-style: preserve-3d;
+        }
+        [id^="card-"]:hover {
+            transition: none; /* Let vanilla-tilt handle all transforms */
+        }
+    </style>
 </head>
-<body class="font-sans bg-white dark:bg-gray-900 text-black dark:text-white overflow-hidden transition-colors duration-300">
-    <!-- PWA Install Banner -->
-    <div id="installBanner" class="fixed bottom-14 left-0 right-0 bg-blue-600 text-white p-3 flex items-center justify-between z-50 transform translate-y-full transition-transform duration-300">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-download"></i>
-            <span class="text-sm font-medium">Install ViBBS – Visualization Building Blocks and Scenarios for offline access</span>
-        </div>
-        <div class="flex gap-2">
-            <button id="installButton" class="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100 transition-colors">
-                Install
-            </button>
-            <button id="dismissInstall" class="text-white hover:text-gray-200 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
+<body class="font-sans bg-white text-black overflow-hidden transition-colors duration-300">
     <!-- Header -->
-    <div class="text-center border-b border-gray-300 dark:border-gray-600">
-        <div class="flex items-center justify-between pl-4 pr-4 py-3 bg-gray-50 dark:bg-gray-800">
+    <div class="text-center border-b border-gray-300 shadow-sm">
+        <div class="flex items-center justify-between pl-4 pr-4 py-3 bg-gray-50">
             <div class="flex items-center gap-3">
-                <img src="Icon-256.png" alt="ViBBS Logo" class="w-10 h-10">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+                    <img src="icon.png" alt="ViBBS Logo" class="w-10 h-10">
+                </div>
                 <div class="flex flex-col text-left gap-0">
                     <h1 class="text-xl font-semibold">ViBBS</h1>
-                    <h4 class="text-sm text-gray-600 dark:text-gray-400">Visualization Building Blocks and Scenarios</h4>
+                    <h4 class="text-sm text-gray-600">Visualization Building Blocks and Scenarios</h4>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <!-- Desktop Segmented Control -->
-                <div class="hidden md:flex justify-center bg-gray-50 dark:bg-gray-800">
-                    <div class="bg-gray-200 dark:bg-gray-700 p-1 mr-1 rounded-lg flex">
-                        <button class="flex inline gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm">
+            <div class="flex gap-2 md:w-auto items-center justify-end">
+                <div class="hidden md:flex justify-center bg-gray-50">
+                    <div class="bg-gray-200 p-1 mr-1 rounded-lg flex">
+                        <button class="flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-blue-600 shadow-sm"
+                                id="cardsTabButton"
+                                onclick="switchToCards()">
                             <svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M51.8 160.4c-3.7 2.1-4.9 6.8-2.8 10.5l167 289.3c2.1 3.7 6.8 4.9 10.5 2.8L419.4 351.6c3.7-2.1 4.9-6.8 2.8-10.5L255.2 51.8c-2.1-3.7-6.8-4.9-10.5-2.8L51.8 160.4zM7.5 194.9c-15.4-26.6-6.3-60.7 20.4-76.1L220.7 7.5c26.6-15.4 60.7-6.3 76.1 20.4l167 289.3c15.4 26.6 6.2 60.7-20.4 76.1L250.5 504.5c-26.6 15.4-60.7 6.2-76.1-20.4L7.5 194.9zm451.9 226c41.9-24.2 56.3-77.8 32.1-119.8L354.7 64.2c1.7-.2 3.5-.2 5.3-.2l224 0c30.9 0 56 25.1 56 56l0 336c0 30.9-25.1 56-56 56l-224 0c-13.7 0-26.2-4.9-35.9-13l135.3-78.1z"/></svg>Cards
                         </button>
-                        <button class="flex inline gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" 
-                                onclick="navigateToScenarios()">
+                        <button class="flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800"
+                                id="scenariosTabButton"
+                                onclick="switchToScenarios()">
                                 <svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M374.8 80.3C355.9 33.2 309.8 0 256 0s-99.9 33.2-118.8 80.3c-3-.2-6.1-.3-9.2-.3C57.3 80 0 137.3 0 208s57.3 128 128 128c14.4 0 28.3-2.4 41.3-6.8C184.7 361.6 217.7 384 256 384s71.3-22.4 86.7-54.8c12.9 4.4 26.8 6.8 41.3 6.8c70.7 0 128-57.3 128-128s-57.3-128-128-128c-3.1 0-6.1 .1-9.2 .3zM144 480a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM32 512a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>Scenarios
                         </button>
                     </div>
                 </div>
-                <!-- PWA Status Indicator -->
-                <div id="pwaStatus" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200" title="PWA Status">
-                    <i class="fas fa-wifi text-sm" id="statusIcon"></i>
+                <!-- Loading indicator -->
+                <div id="loadingIndicator" class="bg-gray-100 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200">
+                    <i class="fas fa-spinner fa-spin text-sm"></i>
                 </div>
-                <button class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200" 
-                        onclick="toggleDarkMode()" id="darkModeToggle">
-                    <i class="fas fa-moon text-sm" id="darkModeIcon"></i>
-                </button>
-                <button class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200" 
+                <button class="bg-gray-200 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200" 
                         onclick="openInfoModal()">
                     <i class="fas fa-info text-sm"></i>
                 </button>
@@ -83,23 +97,45 @@
         </div>
     </div>
     <!-- Main Container -->
-    <div class="h-screen flex flex-col" style="height: calc(100vh - 120px);">
-        <div class="flex-1 overflow-y-scroll mt-16 md:mt-0">
-            <div class="h-full flex flex-row" id="decksContainer">
-                <!-- Decks will be generated by JavaScript -->
+    <div id="mainContainer">
+        <!-- Cards View -->
+        <div class="h-screen flex flex-col" style="height: calc(100vh - 120px)" id="cardsView">
+            <div class="flex-1 overflow-y-scroll mt-16 md:mt-0">
+                <div class="h-full flex flex-row" id="cardsContent">
+                    <!-- Loading message for cards -->
+                    <div class="flex-1 flex items-center justify-center text-gray-500" id="loadingMessage">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Discovering cards...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Scenarios View -->
+        <div class="hidden h-screen flex flex-col bg-slate-100" id="scenariosView">
+            <div class="flex-1 overflow-y-auto mt-16 md:mt-0">
+                <div class="scenarios-grid" id="scenariosGallery">
+                    <div class="col-span-full flex items-center justify-center text-gray-500 py-8">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Loading scenarios...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <!-- Pinned Cards Drawer -->
-    <div class="fixed bottom-3 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600 z-50 transform transition-transform duration-300" 
+    <div class="fixed bottom-3 left-0 right-0 bg-white border-t border-gray-300 z-50 transform transition-transform duration-300" 
          id="drawer" style="transform: translateY(calc(100% - 48px)); box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.1);">
-        <div class="flex justify-between items-center border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 cursor-pointer" 
+        <div class="flex justify-between items-center border-b border-gray-300 bg-gray-50 cursor-pointer" 
              onclick="toggleDrawer()">
             <h2 class="font-semibold p-4">
                 Pinned Cards
-                <span class="ml-2 bg-gray-600 dark:bg-gray-500 text-white px-3 py-1 text-xs rounded-full" id="pinnedCount">0</span>
+                <span class="ml-2 bg-gray-600 text-white px-3 py-1 text-xs rounded-full" id="pinnedCount">0</span>
             </h2>
-            <button class="text-lg p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+            <button class="text-lg p-4 rounded-lg hover:bg-gray-100">
                 <i class="fas fa-chevron-up"></i>
             </button>
         </div>
@@ -109,296 +145,567 @@
             </div>
             <div class="flex-1 overflow-hidden">
                 <div class="flex gap-4 h-full overflow-x-auto" id="pinnedCards">
-                    <div class="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400 text-center min-w-full">
-                        No cards pinned yet. Pin some cards to see them here!
+                    <div class="flex items-center justify-center h-48 text-gray-500 text-center min-w-full">
+                        No cards pinned yet. Click on a card or use the pin button to save cards to your collection.
                     </div>
                 </div>
             </div>
+            <span class="text-gray-500 text-sm pl-4 pt-3 block">
+                <i class="fas fa-info-circle text-xs mr-1"></i>
+                To remove a pinned card from your collection, just click on the card.
+            </span>
         </div>
     </div>
     <!-- Info Modal -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 z-50 flex items-center justify-center hidden" id="infoModal" onclick="closeInfoModal()">
-        <div class="bg-white dark:bg-gray-800 rounded-lg max-w-2xl max-h-[80vh] overflow-y-auto m-4 shadow-xl" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 p-6 py-3 bg-gray-50 dark:bg-gray-700">
-                <h2 class="text-xl font-semibold">About ViBBS – Visualization Building Blocks and Scenarios</h2>
-                <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center" 
+    <div class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center transition-all hidden" id="infoModal" onclick="closeInfoModal()">
+        <div class="bg-white rounded-lg max-w-2xl max-h-[80vh] m-4 shadow-xl flex flex-col" onclick="event.stopPropagation()">
+            <!-- Fixed Header -->
+            <div class="flex justify-between items-center border-b shadow-sm p-6 py-4 bg-gray-50 rounded-t-lg flex-shrink-0">
+                <div class="flex flex-col items-left gap-0">
+                    <h2 class="text-xl font-semibold">About ViBBS</h2>
+                    <span class="text-sm text-gray-500">Visualization Building Blocks and Scenarios</span>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700 w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors duration-200" 
                         onclick="closeInfoModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-4">
-                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    The <b>ViBBS – Visualization Building Blocks and Scenarios</b> tool helps you explore and organize different visualization techniques and design patterns. 
-                    Each card represents a specific approach or method that can be applied to data visualization projects.
-                    Cards courtesy of <a href="https://www.igd.fraunhofer.de/de/institut/mitarbeitende/thorsten-may.html" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">Thorsten May</a> from Fraunhofer IGD, <a href="https://lcibulski.github.io/" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">Lena Cibulski</a> from the University of Rostock, <a href="https://www.au.dk/en/petermus@au.dk" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">Peter Musaeus</a> and <a href="https://cs.au.dk/~hjschulz/" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">Hans-Jörg Schulz</a> from Aarhus University. Developed by <a href="https://arvindchee.nu/" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">Arvind Srinivasan</a> as a personal project to make these digital.
-                </p>
-                <div class="space-y-3">
-                    <h3 class="font-semibold text-lg">Card Categories</h3>
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto min-h-0">
+                <div class="p-6 space-y-4">
+                    <p class="text-gray-700 leading-relaxed">
+                        The <b>ViBBS – Visualization Building Blocks and Scenarios</b> tool helps you explore and organize different visualization techniques and design patterns. 
+                        Each card represents a specific approach or method that can be applied to data visualization projects.
+                    </p>
+                    <p class="text-sm text-gray-700 leading-relaxed">
+                        Cards courtesy of <a href="https://www.igd.fraunhofer.de/de/institut/mitarbeitende/thorsten-may.html" class="text-blue-600 dark:text-blue-600 hover:underline" target="_blank">Thorsten May</a> from Fraunhofer IGD, <a href="https://lcibulski.github.io/" class="text-blue-600 dark:text-blue-600 hover:underline" target="_blank">Lena Cibulski</a> from the University of Rostock, <a href="https://www.au.dk/en/petermus@au.dk" class="text-blue-600 dark:text-blue-600 hover:underline" target="_blank">Peter Musaeus</a> and <a href="https://cs.au.dk/~hjschulz/" class="text-blue-600 dark:text-blue-600 hover:underline" target="_blank">Hans-Jörg Schulz</a> from Aarhus University. Developed by <a href="https://arvindchee.nu/" class="text-blue-600 dark:text-blue-600 hover:underline" target="_blank">Arvind Srinivasan</a> as a personal project to make these digital.
+                    </p>
                     <div class="space-y-3">
-                        <div class="flex items-start gap-3">
-                            <div class="w-4 h-4 bg-sky-600 rounded-sm mt-1 flex-shrink-0"></div>
-                            <div>
-                                <h4 class="font-medium">Visualization</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Specific chart types and visualization formats including bar charts, scatterplots, treemaps, and network diagrams.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-4 h-4 bg-blue-600 rounded-sm mt-1 flex-shrink-0"></div>
-                            <div>
-                                <h4 class="font-medium">Mapping</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Visual encoding methods that map data to visual properties like color, size, shape, and position.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-4 h-4 bg-purple-600 rounded-sm mt-1 flex-shrink-0"></div>
-                            <div>
-                                <h4 class="font-medium">Layout</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Spatial arrangement and composition techniques including small multiples, nesting, and juxtaposition patterns.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-4 h-4 bg-green-600 rounded-sm mt-1 flex-shrink-0"></div>
-                            <div>
-                                <h4 class="font-medium">Interaction</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Interactive techniques like brushing, filtering, zooming, and tooltips that allow users to explore data dynamically.</p>
-                            </div>
+                        <h3 class="font-semibold text-lg">Card Categories</h3>
+                        <div class="space-y-3" id="categoryDescriptions">
+                            <!-- Categories will be populated by JavaScript -->
                         </div>
                     </div>
-                </div>
-                <div class="space-y-3">
-                    <h3 class="font-semibold text-lg">How to Use</h3>
-                    <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-thumbtack text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Pin cards</strong> by clicking on them or using the pin button to save them to your collection</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-eye-slash text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Hide pinned cards</strong> in each category to focus on unpinned options</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-filter text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Filter pinned cards</strong> by category in the bottom drawer</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-chevron-up text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Open the drawer</strong> at the bottom to view and manage your pinned cards</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-moon text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Toggle dark mode</strong> using the moon/sun button in the header</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-download text-xs mt-1 text-gray-500 dark:text-gray-400"></i>
-                            <span><strong>Install as PWA</strong> for offline access and app-like experience</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
-                        <i class="fas fa-lightbulb mr-2"></i>
-                        <strong>Tip:</strong> Use this tool during the design process to explore different visualization approaches and build a collection of techniques relevant to your project.
-                    </p>
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-lg">How to Use</h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-thumbtack text-xs mt-1 text-gray-500"></i>
+                                <span><strong>Pin cards</strong> by clicking on them or using the pin button to save them to your collection</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-eye-slash text-xs mt-1 text-gray-500"></i>
+                                <span><strong>Hide pinned cards</strong> in each category to focus on unpinned options</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-filter text-xs mt-1 text-gray-500"></i>
+                                <span><strong>Filter pinned cards</strong> by category in the bottom drawer</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-chevron-up text-xs mt-1 text-gray-500"></i>
+                                <span><strong>Open the drawer</strong> at the bottom to view and manage your pinned cards</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-images text-xs mt-1 text-gray-500"></i>
+                                <span><strong>Switch to Scenarios</strong> to view scenario gallery with PhotoSwipe lightbox</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- Mobile Top Segmented Control -->
-    <div class="md:hidden fixed top-[70px] w-full pl-4 pr-2 flex justify-center bg-gray-50 dark:bg-gray-800">
-        <div class="bg-gray-200 dark:bg-gray-700 p-1 mr-1 rounded-lg flex mb-3 flex-1">
-            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm">
+    <div class="md:hidden fixed shadow-md top-[70px] w-full pl-4 pr-2 flex justify-center bg-gray-50">
+        <div class="bg-gray-200 p-1 mr-1 rounded-lg flex mb-3 flex-1">
+            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-blue-600 shadow-sm"
+                    id="cardsTabButtonMobile"
+                    onclick="switchToCards()">
                 <div class="flex flex-col items-center"><svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M51.8 160.4c-3.7 2.1-4.9 6.8-2.8 10.5l167 289.3c2.1 3.7 6.8 4.9 10.5 2.8L419.4 351.6c3.7-2.1 4.9-6.8 2.8-10.5L255.2 51.8c-2.1-3.7-6.8-4.9-10.5-2.8L51.8 160.4zM7.5 194.9c-15.4-26.6-6.3-60.7 20.4-76.1L220.7 7.5c26.6-15.4 60.7-6.3 76.1 20.4l167 289.3c15.4 26.6 6.2 60.7-20.4 76.1L250.5 504.5c-26.6 15.4-60.7 6.2-76.1-20.4L7.5 194.9zm451.9 226c41.9-24.2 56.3-77.8 32.1-119.8L354.7 64.2c1.7-.2 3.5-.2 5.3-.2l224 0c30.9 0 56 25.1 56 56l0 336c0 30.9-25.1 56-56 56l-224 0c-13.7 0-26.2-4.9-35.9-13l135.3-78.1z"/></svg>Cards</div>
             </button>
-            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" 
-                    onclick="navigateToScenarios()">
+            <button class="flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800" 
+                    id="scenariosTabButtonMobile"
+                    onclick="switchToScenarios()">
                     <div class="flex flex-col items-center"><svg class="size-[18px] fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Pro 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2025 Fonticons, Inc.--><path d="M374.8 80.3C355.9 33.2 309.8 0 256 0s-99.9 33.2-118.8 80.3c-3-.2-6.1-.3-9.2-.3C57.3 80 0 137.3 0 208s57.3 128 128 128c14.4 0 28.3-2.4 41.3-6.8C184.7 361.6 217.7 384 256 384s71.3-22.4 86.7-54.8c12.9 4.4 26.8 6.8 41.3 6.8c70.7 0 128-57.3 128-128s-57.3-128-128-128c-3.1 0-6.1 .1-9.2 .3zM144 480a48 48 0 1 0 0-96 48 48 0 1 0 0 96zM32 512a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>Scenarios</div>
             </button>
         </div>
     </div>
-    <script>
-        // PWA variables
-        let deferredPrompt;
-        let isInstalled = false;
-        // Dark mode state
-        let darkMode = false;
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('ServiceWorker registration successful');
-                        updatePWAStatus('online');
-                    })
-                    .catch((err) => {
-                        console.log('ServiceWorker registration failed: ', err);
-                        updatePWAStatus('offline');
+    <!-- PhotoSwipe Root -->
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="pswp__bg"></div>
+        <div class="pswp__scroll-wrap">
+            <div class="pswp__container">
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+                <div class="pswp__item"></div>
+            </div>
+            <div class="pswp__ui pswp__ui--hidden">
+                <div class="pswp__top-bar">
+                    <div class="pswp__counter"></div>
+                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                    <div class="pswp__preloader">
+                        <div class="pswp__preloader__icn">
+                            <div class="pswp__preloader__cut">
+                                <div class="pswp__preloader__donut"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pswp__caption">
+                    <div class="pswp__caption__center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        // Import PhotoSwipe
+        import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5/dist/photoswipe-lightbox.esm.js';
+        // Global variables
+        let currentView = 'cards'; // 'cards' or 'scenarios'
+        let lightbox;
+        let cardData = {};
+        let decks = [];
+        let deckConfig = {};
+        let deckConfigFromFile = {}; 
+        let pinnedCards = [];
+        let hidePinnedStates = [];
+        let activeFilter = 'all';
+        let isDesktop = false;
+        // Check if device is desktop (not mobile/tablet)
+        function checkIfDesktop() {
+            isDesktop = window.innerWidth >= 1024 && !('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        }
+        // Initialize tilt effect for cards (desktop only)
+        function initTiltForCards(selector = '[id^="card-"]') {
+            if (!isDesktop) return;
+            // Wait a bit for DOM updates
+            setTimeout(() => {
+                const cards = document.querySelectorAll(selector);
+                cards.forEach(card => {
+                    // Skip if already initialized
+                    if (card.vanillaTilt) return;
+                    VanillaTilt.init(card, {
+                        max: 8,              // Maximum tilt (degrees)
+                        speed: 1000,         // Speed of tilt animation (higher = slower)
+                        glare: true,         // Enable glare effect
+                        "max-glare": 0.55,   // Maximum glare opacity
+                        perspective: 1000,   // Transform perspective
+                        scale: 1.02,         // Scale on hover
+                        transition: false,   // Disable CSS transitions for smoother movement
+                        reset: true,         // Reset tilt on mouse leave
+                        "reset-to-start": false,
+                        gyroscope: false,    // Disable gyroscope
+                        "mouse-event-element": null,
+                        "reset-transition": true
                     });
+                });
+            }, 100);
+        }
+        // Initialize tilt for pinned cards in drawer
+        function initTiltForPinnedCards() {
+            if (!isDesktop) return;
+            setTimeout(() => {
+                const pinnedCards = document.querySelectorAll('#pinnedCards > div[onclick]');
+                pinnedCards.forEach(card => {
+                    if (card.vanillaTilt) return;
+                    VanillaTilt.init(card, {
+                        max: 6,              // Slightly less tilt for pinned cards
+                        speed: 1200,         // Slightly slower for pinned cards
+                        glare: true,
+                        "max-glare": 0.2,    // Less glare for pinned cards
+                        perspective: 800,
+                        scale: 1.01,         // Subtle scale
+                        transition: false,   // Disable CSS transitions for smoother movement
+                        reset: true,
+                        "reset-to-start": false,
+                        gyroscope: false,
+                        "mouse-event-element": null,
+                        "reset-transition": true
+                    });
+                });
+            }, 150);
+        }
+        // Destroy tilt instances for cards that are being updated
+        function destroyTiltForCards(selector) {
+            const cards = document.querySelectorAll(selector);
+            cards.forEach(card => {
+                if (card.vanillaTilt) {
+                    card.vanillaTilt.destroy();
+                }
             });
         }
-        // PWA Install Handler
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            showInstallBanner();
-        });
-        // Check if app is installed
-        window.addEventListener('appinstalled', () => {
-            isInstalled = true;
-            hideInstallBanner();
-            updatePWAStatus('installed');
-        });
-        // Show install banner
-        function showInstallBanner() {
-            if (!isInstalled) {
-                const banner = document.getElementById('installBanner');
-                banner.style.transform = 'translateY(0)';
-            }
+        function makeColorScheme(color) {
+            let colorScheme = {}
+            colorScheme.color = color;
+            colorScheme.borderColor = `border-${color}-800`;
+            colorScheme.bgColor = `bg-${color}-100`;
+            colorScheme.headerBgColor = `bg-${color}-800 text-white`;
+            colorScheme.activePillColor = `bg-${color}-600`;
+            colorScheme.activePillHover = `hover:bg-${color}-700`;
+            return colorScheme;
         }
-        // Hide install banner
-        function hideInstallBanner() {
-            const banner = document.getElementById('installBanner');
-            banner.style.transform = 'translateY(100%)';
+        const defaultColorSchemes = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose', 'slate', 'gray', 'zinc', 'neutral', 'stone'].map(color => makeColorScheme(color));
+        // Switch to Cards view
+        window.switchToCards = function() {
+            currentView = 'cards';
+            updateTabState();
+            showCardsView();
         }
-        // Install button handler
-        document.getElementById('installButton').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    hideInstallBanner();
-                }
-                deferredPrompt = null;
-            }
-        });
-        // Dismiss install banner
-        document.getElementById('dismissInstall').addEventListener('click', () => {
-            hideInstallBanner();
-        });
-        // Update PWA status indicator
-        function updatePWAStatus(status) {
-            const statusIcon = document.getElementById('statusIcon');
-            const pwaStatus = document.getElementById('pwaStatus');
-            switch(status) {
-                case 'online':
-                    statusIcon.className = 'fas fa-wifi text-sm';
-                    pwaStatus.title = 'Online';
-                    pwaStatus.className = 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200';
-                    break;
-                case 'offline':
-                    statusIcon.className = 'fas fa-wifi-slash text-sm';
-                    pwaStatus.title = 'Offline';
-                    pwaStatus.className = 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200';
-                    break;
-                case 'installed':
-                    statusIcon.className = 'fas fa-mobile-alt text-sm';
-                    pwaStatus.title = 'Installed PWA';
-                    pwaStatus.className = 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200';
-                    break;
-            }
+        // Switch to Scenarios view
+        window.switchToScenarios = function() {
+            currentView = 'scenarios';
+            updateTabState();
+            showScenariosView();
         }
-        // Monitor online/offline status
-        window.addEventListener('online', () => updatePWAStatus('online'));
-        window.addEventListener('offline', () => updatePWAStatus('offline'));
-        // Initialize dark mode based on system preference
-        function initDarkMode() {
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const savedDarkMode = localStorage.getItem('darkMode');
-            darkMode = savedDarkMode ? JSON.parse(savedDarkMode) : systemPrefersDark;
-            applyDarkMode();
-        }
-        // Apply dark mode
-        function applyDarkMode() {
-            const html = document.documentElement;
-            const icon = document.getElementById('darkModeIcon');
-            if (darkMode) {
-                html.classList.add('dark');
-                icon.className = 'fas fa-sun text-sm';
+        // Update tab state
+        function updateTabState() {
+            const cardsTabButton = document.getElementById('cardsTabButton');
+            const scenariosTabButton = document.getElementById('scenariosTabButton');
+            const cardsTabButtonMobile = document.getElementById('cardsTabButtonMobile');
+            const scenariosTabButtonMobile = document.getElementById('scenariosTabButtonMobile');
+            if (currentView === 'cards') {
+                // Desktop tabs
+                cardsTabButton.className = 'flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-blue-600 shadow-sm';
+                scenariosTabButton.className = 'flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800';
+                // Mobile tabs
+                cardsTabButtonMobile.className = 'flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-blue-600 shadow-sm';
+                scenariosTabButtonMobile.className = 'flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800';
             } else {
-                html.classList.remove('dark');
-                icon.className = 'fas fa-moon text-sm';
+                // Desktop tabs
+                cardsTabButton.className = 'flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800';
+                scenariosTabButton.className = 'flex flex-row gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-teal-600 shadow-sm';
+                // Mobile tabs
+                cardsTabButtonMobile.className = 'flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-gray-200 text-gray-600 hover:text-gray-800';
+                scenariosTabButtonMobile.className = 'flex-1 gap-2 px-4 py-1 rounded-md text-sm font-medium transition-all duration-200 bg-white text-teal-600 shadow-sm';
             }
-            localStorage.setItem('darkMode', JSON.stringify(darkMode));
         }
-        // Toggle dark mode
-        function toggleDarkMode() {
-            darkMode = !darkMode;
-            applyDarkMode();
+        // Show Cards view
+        function showCardsView() {
+            document.getElementById('cardsView').classList.remove('hidden');
+            document.getElementById('scenariosView').classList.add('hidden');
+            document.getElementById('drawer').style.display = 'block';
+            // Reinitialize tilt effects for cards that might have been rendered
+            initTiltForCards();
         }
-        // Navigate to scenarios page
-        function navigateToScenarios() {
-            window.location.href = 'scenarios.html';
-        }
-        // Card data structure based on actual files
-        const cardData = {
-
-            visualization: [
-                'area-chart', 'bar-chart', 'boxplot', 'bubble-chart', 'chloropleth-map',
-                'dendrogram', 'dot-plot', 'heatmap', 'histogram', 'horizon-plot',
-                'icicle-plot', 'line-chart', 'lollipop', 'matrix', 'node-link-diagram',
-                'normalized-stacked-bar-chart', 'pie-chart', 'scatterplot', 'stacked-area-chart',
-                'stacked-bar-chart', 'starplot', 'sunburst', 'table', 'treemap', 'violin-plot'
-            ],
-            mapping: [
-                'color-categorical', 'color-diverging', 'color-diverging-discrete', 'color-sequential',
-                'color-sequential-discrete', 'label', 'length', 'orientation',
-                'outline', 'redundant-mapping', 'shape', 'size', 'texture', 'variable-mapping'
-            ],
-            layout: [
-                'attentive-arrangement', 'captivating-caption', 'juxtaposition', 'juxtaposition-similar',
-                'legendary-legends', 'nested-axis', 'nesting', 'nice-numbers',
-                'overloading', 'small-multiples', 'sparklines', 'superimposition', 'superimposition-similar'
-            ],
-            interaction: [
-                'brushing', 'brushing-and-linking', 'details-on-demand', 'faceted-search',
-                'filtering', 'fish-eye-zoom', 'magic-lens', 'overview-and-detail',
-                'search', 'semantic-zoom', 'sorting', 'tooltip', 'zoom-and-pan'
-            ]
-        };
-        const decks = [
-            { 
-                title: "Visualization", 
-                key: "visualization", 
-                cards: cardData.visualization, 
-                borderColor: "border-sky-800",
-                bgColor: "bg-sky-50 dark:bg-sky-900/20",
-                headerBgColor: "bg-sky-800 text-white dark:bg-sky-800",
-                activePillColor: "bg-sky-600 dark:bg-sky-500",
-                activePillHover: "hover:bg-sky-700 dark:hover:bg-sky-600"
-            },
-            { 
-                title: "Mapping", 
-                key: "mapping", 
-                cards: cardData.mapping, 
-                borderColor: "border-blue-800",
-                bgColor: "bg-blue-50 dark:bg-blue-900/20",
-                headerBgColor: "bg-blue-800 text-white dark:bg-blue-800",
-                activePillColor: "bg-blue-600 dark:bg-blue-500",
-                activePillHover: "hover:bg-blue-700 dark:hover:bg-blue-600"
-            },
-            { 
-                title: "Layout", 
-                key: "layout", 
-                cards: cardData.layout, 
-                borderColor: "border-purple-800",
-                bgColor: "bg-purple-50 dark:bg-purple-900/20",
-                headerBgColor: "bg-purple-800 text-white dark:bg-purple-800",
-                activePillColor: "bg-purple-600 dark:bg-purple-500",
-                activePillHover: "hover:bg-purple-700 dark:hover:bg-purple-600"
-            },
-            { 
-                title: "Interaction", 
-                key: "interaction", 
-                cards: cardData.interaction, 
-                borderColor: "border-green-800",
-                bgColor: "bg-green-50 dark:bg-green-900/20",
-                headerBgColor: "bg-green-800 text-white dark:bg-green-800",
-                activePillColor: "bg-green-600 dark:bg-green-500",
-                activePillHover: "hover:bg-green-700 dark:hover:bg-green-600"
+        // Show Scenarios view
+        function showScenariosView() {
+            document.getElementById('cardsView').classList.add('hidden');
+            document.getElementById('scenariosView').classList.remove('hidden');
+            document.getElementById('drawer').style.display = 'none';
+            // Load scenarios if not already loaded
+            if (!document.querySelector('.scenario-card')) {
+                loadScenarios();
             }
-        ];
-        let pinnedCards = [];
-        let hidePinnedStates = [false, false, false, false];
-        let activeFilter = 'all';
+        }
+        // Initialize PhotoSwipe
+        function initPhotoSwipe() {
+            if (lightbox) {
+                lightbox.destroy();
+            }
+            lightbox = new PhotoSwipeLightbox({
+                gallery: '#scenariosGallery',
+                children: 'a',
+                pswpModule: () => import('https://unpkg.com/photoswipe@5/dist/photoswipe.esm.js'),
+            });
+            lightbox.init();
+        }
+        // Fetch scenario images
+        async function fetchScenarioImages() {
+            try {
+                const response = await fetch('scenarios/');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                const images = Array.from(doc.querySelectorAll('a'))
+                    .map(a => a.getAttribute('href'))
+                    .filter(href => href && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg')))
+                    .sort((a, b) => a.localeCompare(b))
+                    .map(href => href.replace(/scenarios\//, ''));
+                return images;
+            } catch (error) {
+                console.error('Error fetching scenario images:', error);
+                return [];
+            }
+        }
+        // Load scenarios
+        async function loadScenarios() {
+            const grid = document.getElementById('scenariosGallery');
+            grid.innerHTML = `
+                <div class="col-span-full flex items-center justify-center text-gray-500">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                        <p>Loading scenarios...</p>
+                    </div>
+                </div>
+            `;
+            const imagePaths = await fetchScenarioImages();
+            if (imagePaths.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No scenario images found in the scenarios folder.</div>';
+                return;
+            }
+            const imagePromises = imagePaths.map((imagePath, index) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        const scenarioCard = document.createElement('a');
+                        scenarioCard.href = `scenarios/${imagePath}`;
+                        scenarioCard.className = 'scenario-card';
+                        scenarioCard.setAttribute('data-pswp-width', this.naturalWidth);
+                        scenarioCard.setAttribute('data-pswp-height', this.naturalHeight);
+                        scenarioCard.setAttribute('target', '_blank');
+                        scenarioCard.setAttribute('data-scenario-index', index);
+                        scenarioCard.innerHTML = `<img src="scenarios/${imagePath}" alt="Scenario ${imagePath}" loading="lazy">`;
+                        resolve({ element: scenarioCard, index });
+                    };
+                    img.onerror = function() {
+                        console.error(`Failed to load image: ${imagePath}`);
+                        reject(new Error(`Failed to load image: ${imagePath}`));
+                    };
+                    img.src = `scenarios/${imagePath}`;
+                });
+            });
+            try {
+                const results = await Promise.allSettled(imagePromises);
+                const successfulResults = results
+                    .filter(result => result.status === 'fulfilled')
+                    .map(result => result.value)
+                    .sort((a, b) => a.index - b.index);
+                if (successfulResults.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Failed to load any scenario images.</div>';
+                    return;
+                }
+                grid.innerHTML = '';
+                successfulResults.forEach(({ element }) => {
+                    grid.appendChild(element);
+                });
+                attachHoverEffectToScenarioCards();
+                initPhotoSwipe();
+            } catch (error) {
+                console.error('Error loading scenarios:', error);
+                grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">Error loading scenario images.</div>';
+            }
+        }
+        // === CARDS FUNCTIONALITY (from original file) ===
+        // Load deck configuration from deck.json
+        async function loadDeckConfig() {
+            try {
+                const response = await fetch('./deck.json');
+                if (response.ok) {
+                    const config = await response.json();
+                    if (config.decks && Array.isArray(config.decks)) {
+                        deckConfigFromFile = {};
+                        config.decks.forEach(deck => {
+                            deckConfigFromFile[deck.id] = deck;
+                        });
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.error('Could not load deck.json, using default configuration:', error);
+            }
+            return false;
+        }
+        // Get color scheme for a color name
+        function getColorScheme(colorName) {
+            const colorSchemes = defaultColorSchemes.reduce((acc, color) => {
+                acc[color.color] = color;
+                return acc;
+            }, {});
+            return colorSchemes[colorName.toLowerCase()] || colorSchemes.blue;
+        }
+        // Hide loading indicator
+        function hideLoadingIndicator() {
+            const indicator = document.getElementById('loadingIndicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+        // Format deck name for display
+        function formatDeckName(deckName) {
+            return deckName.replace('/cards/','').split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+        // Parse filename to extract deck and card names
+        function parseFilename(filename) {
+            const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
+            const underscoreIndex = nameWithoutExt.indexOf('_');
+            if (underscoreIndex === -1) {
+                return null;
+            }
+            const deckName = nameWithoutExt.substring(0, underscoreIndex);
+            const cardName = nameWithoutExt.substring(underscoreIndex + 1);
+            return { deckName, cardName };
+        }
+        // Try to discover cards from directory listing
+        async function tryDirectoryListing() {
+            try {
+                const response = await fetch('cards/');
+                if (!response.ok) {
+                    return null;
+                }
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = doc.querySelectorAll('a[href]');
+                const filenames = [];
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href && href.endsWith('.png') && href.includes('_')) {
+                        filenames.push(href);
+                    }
+                });
+                if (filenames.length === 0) {
+                    const preElements = doc.querySelectorAll('pre');
+                    preElements.forEach(pre => {
+                        const text = pre.textContent || pre.innerText;
+                        const lines = text.split('\n');
+                        lines.forEach(line => {
+                            const match = line.match(/([a-zA-Z0-9_-]+\.png)/);
+                            if (match && match[1].includes('_')) {
+                                filenames.push(match[1]);
+                            }
+                        });
+                    });
+                }
+                return filenames.length > 0 ? filenames : null;
+            } catch (error) {
+                console.error('Directory listing not available:', error);
+                return null;
+            }
+        }
+        // Discover cards from server
+        async function discoverCards() {
+            const filenames = await tryDirectoryListing();
+            if (filenames) {
+                cardData = {};
+                filenames.forEach(filename => {
+                    const parsed = parseFilename(filename);
+                    if (parsed) {
+                        if (!cardData[parsed.deckName]) {
+                            cardData[parsed.deckName] = [];
+                        }
+                        cardData[parsed.deckName].push(parsed.cardName);
+                    }
+                });
+                generateDeckConfigFromCardData();
+                buildDecksFromCardData();
+                return;
+            }
+        }
+        // Generate deck configuration from discovered card data
+        function generateDeckConfigFromCardData() {
+            deckConfig = {};
+            const deckNames = Object.keys(cardData);
+            deckNames.forEach((deckName, index) => {
+                const configFromFile = deckConfigFromFile[deckName.replace('cards/', '').replace('/', '')];
+                let colorScheme;
+                let title;
+                let description;
+                if (configFromFile) {
+                    colorScheme = getColorScheme(configFromFile.color);
+                    title = configFromFile.title;
+                    description = configFromFile.description;
+                } else {
+                    colorScheme = defaultColorSchemes[index % defaultColorSchemes.length];
+                    title = formatDeckName(deckName);
+                    description = `Cards in the ${title} category.`;
+                }
+                deckConfig[deckName] = {
+                    title: title,
+                    description: description,
+                    order: configFromFile ? configFromFile.order : index + 1,
+                    ...colorScheme
+                };
+            });
+        }
+        // Build decks structure from discovered card data
+        function buildDecksFromCardData() {
+            decks = [];
+            hidePinnedStates = [];
+            const deckEntries = Object.keys(cardData).map(deckKey => ({
+                key: deckKey,
+                config: deckConfig[deckKey],
+                cards: cardData[deckKey]
+            }));
+            deckEntries.sort((a, b) => {
+                const orderA = a.config.order || 999;
+                const orderB = b.config.order || 999;
+                return orderA - orderB;
+            });
+            deckEntries.forEach(entry => {
+                if (entry.cards.length > 0) {
+                    decks.push({
+                        title: entry.config.title,
+                        key: entry.key,
+                        cards: entry.cards,
+                        ...entry.config
+                    });
+                    hidePinnedStates.push(false);
+                }
+            });
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) {
+                loadingMessage.style.display = 'none';
+            }
+            if (decks.length === 0) {
+                showNoCardsMessage();
+            } else {
+                renderDecks();
+                updatePinnedCount();
+                updateFilterPills();
+                updatePinnedCardsDisplay();
+                updateInfoModalCategories();
+                // Initialize tilt effects after rendering
+                initTiltForCards();
+            }
+            hideLoadingIndicator();
+        }
+        // Update info modal with categories from configuration
+        function updateInfoModalCategories() {
+            const container = document.getElementById('categoryDescriptions');
+            let categoriesHTML = '';
+            decks.forEach(deck => {
+                const colorClass = `bg-${deck.color}-600`;
+                categoriesHTML += `
+                    <div class="flex items-start gap-3">
+                        <div class="w-4 h-4 ${colorClass} rounded-sm mt-1 flex-shrink-0"></div>
+                        <div>
+                            <h4 class="font-medium">${deck.title}</h4>
+                            <p class="text-sm text-gray-600">${deck.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = categoriesHTML;
+        }
+        // Show message when no cards are found
+        function showNoCardsMessage() {
+            const container = document.getElementById('cardsContent');
+            container.innerHTML = `
+                <div class="flex-1 flex items-center justify-center text-gray-500">
+                    <div class="text-center max-w-md">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p class="mb-4">No cards found in the cards folder.</p>
+                        <div class="text-sm space-y-2">
+                            <p>Add card files using the naming pattern:</p>
+                            <div class="bg-gray-100 p-3 rounded">
+                                <code>deck-name_card-name.png</code>
+                            </div>
+                            <div class="text-xs text-gray-400 mt-3">
+                                Examples:<br>
+                                <code>visualization_bar-chart.png</code><br>
+                                <code>interaction_tooltip.png</code><br>
+                                <code>mapping_color-scale.png</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
         // Load data from localStorage
         function loadData() {
             const savedPinnedCards = localStorage.getItem('pinnedCards');
@@ -421,22 +728,16 @@
             localStorage.setItem('activeFilter', activeFilter);
         }
         // Initialize the application
-        function init() {
-            initDarkMode();
+        async function init() {
+            checkIfDesktop();
             loadData();
-            renderDecks();
-            updatePinnedCount();
-            updateFilterPills();
-            updatePinnedCardsDisplay();
-            // Check if running as PWA
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                isInstalled = true;
-                updatePWAStatus('installed');
-            }
+            await loadDeckConfig();
+            await discoverCards();
+            updateTabState();
         }
         // Render all decks
         function renderDecks() {
-            const container = document.getElementById('decksContainer');
+            const container = document.getElementById('cardsContent');
             container.innerHTML = '';
             decks.forEach((deck, deckIndex) => {
                 const deckElement = createDeckElement(deck, deckIndex);
@@ -446,16 +747,16 @@
         // Create a deck element
         function createDeckElement(deck, deckIndex) {
             const deckDiv = document.createElement('div');
-            deckDiv.className = `flex-1 border border-[0.5px] ${deck.borderColor} flex flex-col min-h-0 ${deck.bgColor}`;
+            deckDiv.className = `flex-1 flex flex-col min-h-0 ${deck.bgColor}`;
             deckDiv.id = `deck-${deckIndex}`;
             const visibleCardCount = getVisibleCardCount(deckIndex);
             deckDiv.innerHTML = `
-                <div class="flex justify-between items-center border-b ${deck.borderColor} ${deck.headerBgColor} flex-shrink-0">
+                <div class="flex justify-between items-center border-b ${deck.headerBgColor} flex-shrink-0">
                     <h3 class="font-semibold p-4">
                         ${deck.title}
                         <span class="ml-2 ${deck.activePillColor} text-white px-3 py-1 text-xs rounded-full" id="count-${deckIndex}">${visibleCardCount}</span>
                     </h3>
-                    <button class="bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-600 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm flex items-center gap-2 mr-2 px-4 py-2 rounded-lg transition-colors duration-200" 
+                    <button class="text-sm flex bg-${deck.color}-600 border border-2 border-${deck.color}-900 hover:bg-${deck.color}-500  hover:scale-[102%] active:scale-[98%] active:bg-${deck.color}-700  items-center gap-2 mr-2 px-4 py-2 rounded-lg transition-all duration-200" 
                             id="hideButton-${deckIndex}"
                             onclick="toggleHidePinned(${deckIndex})">
                         <i class="fas ${hidePinnedStates[deckIndex] ? 'fa-eye' : 'fa-eye-slash'}" id="hideIcon-${deckIndex}"></i>
@@ -490,7 +791,7 @@
         // Get border color for card image based on deck and pin status
         function getCardImageBorderColor(deckIndex, isPinned) {
             if (isPinned) {
-                return 'border-black dark:border-white';
+                return 'border-black';
             }
             return decks[deckIndex].borderColor;
         }
@@ -501,30 +802,30 @@
             for (let i = 0; i < deck.cards.length; i++) {
                 const cardId = `${deckIndex}-${i}`;
                 const cardName = deck.cards[i];
-                const imagePath = `cards/${deck.key}_${cardName}.png`;
+                const imagePath = `${deck.key}_${cardName}.png`;
                 const displayName = formatCardName(cardName);
                 const isPinned = pinnedCards.some(card => card.id === cardId);
                 const shouldHide = hidePinnedStates[deckIndex] && isPinned;
                 if (!shouldHide) {
                     hasVisibleCard = true;
                     const imageBorderColor = getCardImageBorderColor(deckIndex, isPinned);
-                    const shadowClass = isPinned ? 'shadow-lg shadow-gray-400 dark:shadow-gray-600' : '';
-                    const bgClass = isPinned ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-white dark:bg-gray-800';
+                    const shadowClass = isPinned ? 'shadow-lg shadow-gray-400' : 'hover:shadow-md hover:shadow-gray-400';
+                    const bgClass = isPinned ? 'bg-blue-50' : 'bg-white';
+                    const deckColor = decks[deckIndex].color;
                     cardsHTML += `
                         <div class="w-[300px] ${bgClass} ${shadowClass} rounded-lg transition-all duration-200 cursor-pointer" 
                              id="card-${cardId}"
                              onclick="togglePin('${cardId}', ${deckIndex}, ${i})">
-                            <div class="w-full rounded-lg bg-gray-100 dark:bg-gray-700 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 dark:text-gray-400 overflow-hidden relative" 
-                                 style="aspect-ratio: 10/16;">
+                            <div class="w-full rounded-lg bg-gray-100 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 overflow-hidden relative">
                                 <img src="${imagePath}" alt="${displayName}" 
                                      class="w-full h-full object-cover"
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm" style="display: none;">
+                                <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm" style="display: none;">
                                     ${displayName}
                                 </div>
-                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center ${isPinned ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500'} z-10 transition-colors duration-200" 
+                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full border border-2 border-${deckColor}-900 text-white text-sm flex items-center justify-center ${isPinned ? `bg-${deckColor}-600 hover:bg-${deckColor}-700` : `bg-white text-${deckColor}-700 hover:bg-${deckColor}-200`} z-10 transition-colors duration-200" 
                                         onclick="event.stopPropagation(); togglePin('${cardId}', ${deckIndex}, ${i})">
-                                    <i class="fas ${isPinned ? 'fa-times' : 'fa-thumbtack'}"></i>
+                                    <i class="fas fa-thumbtack"></i>
                                 </button>
                             </div>
                         </div>
@@ -532,10 +833,10 @@
                 }
             }
             return hasVisibleCard ? cardsHTML : 
-                '<div class="w-[300px] bg-white dark:bg-gray-800 rounded-lg"><div class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 border-4 flex items-center justify-center text-gray-600 dark:text-gray-400 p-4 rounded-lg" style="aspect-ratio: 10/16;">All cards are pinned</div></div>';
+                '<div class="w-[300px] bg-white rounded-lg"><div class="w-full bg-gray-100 border border-gray-200 border-4 flex items-center justify-center text-gray-600 p-4 rounded-lg">All cards are pinned</div></div>';
         }
         // Toggle pin status of a card
-        function togglePin(cardId, deckIndex, cardIndex) {
+        window.togglePin = function(cardId, deckIndex, cardIndex) {
             const existingIndex = pinnedCards.findIndex(card => card.id === cardId);
             if (existingIndex !== -1) {
                 pinnedCards.splice(existingIndex, 1);
@@ -549,7 +850,7 @@
                     title: deck.title,
                     cardName: cardName,
                     displayName: formatCardName(cardName),
-                    imagePath: `cards/${deck.key}_${cardName}.png`,
+                    imagePath: `${deck.key}_${cardName}.png`,
                     cardNumber: cardIndex + 1,
                     totalCards: deck.cards.length
                 });
@@ -565,26 +866,50 @@
         function updateSpecificCard(cardId, deckIndex, cardIndex) {
             const cardElement = document.getElementById(`card-${cardId}`);
             if (!cardElement) return;
+            // Destroy existing tilt before updating
+            if (cardElement.vanillaTilt) {
+                cardElement.vanillaTilt.destroy();
+            }
             const isPinned = pinnedCards.some(card => card.id === cardId);
             const button = cardElement.querySelector('button');
             const icon = button.querySelector('i');
             const imageContainer = cardElement.querySelector('div > div');
             const imageBorderColor = getCardImageBorderColor(deckIndex, isPinned);
+            const deckColor = decks[deckIndex].color;
             if (isPinned) {
-                cardElement.className = `w-[300px] bg-blue-50 dark:bg-blue-900/30 shadow-lg shadow-gray-400 dark:shadow-gray-600 rounded-lg transition-all duration-200 cursor-pointer`;
-                button.className = 'absolute top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center bg-red-600 hover:bg-red-700 z-10 transition-colors duration-200';
-                icon.className = 'fas fa-times';
-                imageContainer.className = `w-full rounded-lg bg-gray-100 dark:bg-gray-700 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 dark:text-gray-400 overflow-hidden relative`;
-            } else {
-                cardElement.className = `w-[300px] bg-white dark:bg-gray-800 rounded-lg transition-all duration-200 cursor-pointer`;
-                button.className = 'absolute top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center bg-black hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 z-10 transition-colors duration-200';
+                cardElement.className = `w-[300px] bg-blue-50 shadow-lg shadow-gray-400 rounded-lg transition-all duration-200 cursor-pointer`;
+                button.className = `absolute border border-2 border-${deckColor}-900 top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center bg-${deckColor}-600 hover:bg-${deckColor}-700 z-10 transition-colors duration-200`;
                 icon.className = 'fas fa-thumbtack';
-                imageContainer.className = `w-full rounded-lg bg-gray-100 dark:bg-gray-700 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 dark:text-gray-400 overflow-hidden relative`;
+                imageContainer.className = `w-full rounded-lg bg-gray-100 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 overflow-hidden relative`;
+            } else {
+                cardElement.className = 'w-[300px] bg-white rounded-lg transition-all duration-200 cursor-pointer';
+                button.className = `absolute border border-2 border-${deckColor}-900 top-3 right-3 w-8 h-8 rounded-full text-white text-sm flex items-center justify-center bg-white text-${deckColor}-700 hover:bg-${deckColor}-200 z-10 transition-colors duration-200`;
+                icon.className = 'fas fa-thumbtack';
+                imageContainer.className = `w-full rounded-lg bg-gray-100 ${imageBorderColor} border-4 flex items-center justify-center text-gray-600 overflow-hidden relative`;
             }
             if (hidePinnedStates[deckIndex] && isPinned) {
                 cardElement.style.display = 'none';
             } else {
                 cardElement.style.display = 'block';
+            }
+            // Reinitialize tilt for this specific card
+            if (isDesktop && cardElement.style.display !== 'none') {
+                setTimeout(() => {
+                    VanillaTilt.init(cardElement, {
+                        max: 8,
+                        speed: 1000,
+                        glare: true,
+                        "max-glare": 0.3,
+                        perspective: 1000,
+                        scale: 1.02,
+                        transition: false,
+                        reset: true,
+                        "reset-to-start": false,
+                        gyroscope: false,
+                        "mouse-event-element": null,
+                        "reset-transition": true
+                    });
+                }, 50);
             }
         }
         // Update deck card count
@@ -595,16 +920,14 @@
             }
         }
         // Toggle hide pinned state
-        function toggleHidePinned(deckIndex) {
+        window.toggleHidePinned = function(deckIndex) {
             hidePinnedStates[deckIndex] = !hidePinnedStates[deckIndex];
-            // Update the button elements using their specific IDs
             const icon = document.getElementById(`hideIcon-${deckIndex}`);
             const text = document.getElementById(`hideText-${deckIndex}`);
             if (icon && text) {
                 icon.className = `fas ${hidePinnedStates[deckIndex] ? 'fa-eye' : 'fa-eye-slash'}`;
                 text.textContent = hidePinnedStates[deckIndex] ? 'Show Pinned' : 'Hide Pinned';
             }
-            // Update all cards in this deck
             for (let i = 0; i < decks[deckIndex].cards.length; i++) {
                 const cardId = `${deckIndex}-${i}`;
                 updateSpecificCard(cardId, deckIndex, i);
@@ -620,19 +943,20 @@
             });
             const totalCount = pinnedCards.length;
             let pillsHTML = `
-                <button class="text-sm border border-gray-300 dark:border-gray-600 ${activeFilter === 'all' ? 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600' : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'} px-2 pl-4 py-2 rounded-full transition-colors duration-200" 
+                <button class="text-sm border border-gray-300 ${activeFilter === 'all' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-50 hover:bg-gray-100'} px-2 pl-4 py-2 rounded-full transition-colors duration-200" 
                         onclick="setFilter('all')">
-                    All<span class="ml-2 px-2 py-1 text-xs ${activeFilter === 'all' ? 'bg-white bg-opacity-30' : 'bg-black dark:bg-white bg-opacity-20 dark:bg-opacity-20'} rounded-full">${totalCount}</span>
+                    All<span class="ml-2 px-2 py-1 text-xs ${activeFilter === 'all' ? 'bg-blue-300 bg-opacity-30' : 'bg-black bg-opacity-20'} rounded-full">${totalCount}</span>
                 </button>
             `;
             decks.forEach((deck, index) => {
+                const colorClass = `bg-${deck.color}-300`;
                 if (deckCounts[index] > 0) {
                     const isActive = activeFilter === index.toString();
-                    const activeClasses = isActive ? `${deck.activePillColor} text-white ${deck.activePillHover}` : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600';
+                    const activeClasses = isActive ? `${deck.activePillColor} text-white ${deck.activePillHover}` : 'bg-gray-50 hover:bg-gray-100';
                     pillsHTML += `
-                        <button class="text-sm border border-gray-300 dark:border-gray-600 ${activeClasses} px-2 pl-4 py-2 rounded-full transition-colors duration-200" 
+                        <button class="text-sm border border-gray-300 ${activeClasses} px-2 pl-4 py-2 rounded-full transition-colors duration-200" 
                                 onclick="setFilter('${index}')">
-                            ${deck.title}<span class="ml-2 px-2 py-1 text-xs ${isActive ? 'bg-white bg-opacity-30' : 'bg-black dark:bg-white bg-opacity-20 dark:bg-opacity-20'} rounded-full">${deckCounts[index]}</span>
+                            ${deck.title}<span class="ml-2 px-2 py-1 text-xs ${isActive ? `${colorClass} bg-opacity-30` : `bg-black bg-opacity-20`} rounded-full">${deckCounts[index]}</span>
                         </button>
                     `;
                 }
@@ -640,7 +964,7 @@
             container.innerHTML = pillsHTML;
         }
         // Set active filter
-        function setFilter(filter) {
+        window.setFilter = function(filter) {
             activeFilter = filter;
             updateFilterPills();
             updatePinnedCardsDisplay();
@@ -649,43 +973,52 @@
         // Update pinned cards display
         function updatePinnedCardsDisplay() {
             const container = document.getElementById('pinnedCards');
+            // Destroy existing tilt instances
+            destroyTiltForCards('#pinnedCards > div[onclick]');
             if (pinnedCards.length === 0) {
-                container.innerHTML = '<div class="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400 text-center min-w-full">No cards pinned yet. Pin some cards to see them here!</div>';
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-48 text-gray-500 text-center min-w-full">
+                        <i class="fas fa-thumbtack text-2xl mb-2"></i>
+                        <h3 class="text-lg font-semibold text-gray-700">No cards pinned yet</h3>
+                        <p class="text-sm text-gray-500">Pin some cards to see them here!</p>
+                    </div>
+                `;
                 return;
             }
             const filteredCards = activeFilter === 'all' 
                 ? pinnedCards 
                 : pinnedCards.filter(card => card.deckIndex.toString() === activeFilter);
             if (filteredCards.length === 0) {
-                container.innerHTML = '<div class="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400 text-center min-w-full">No cards match the selected filter.</div>';
+                container.innerHTML = '<div class="flex items-center justify-center h-48 text-gray-500 text-center min-w-full">No cards match the selected filter.</div>';
                 return;
             }
             const cardsHTML = filteredCards.map(card => `
-                <div class="first:ml-4 w-[250px] h-fit bg-blue-50 dark:bg-blue-900/30 shadow-lg shadow-gray-400 dark:shadow-gray-600 rounded-lg flex-shrink-0 transition-all duration-200 cursor-pointer"
+                <div class="first:ml-4 last:mr-4 mt-4 w-[250px] h-fit bg-blue-50 shadow-none cursor-not-allowed rounded-lg flex-shrink-0 transition-all duration-200 cursor-pointer"
                      onclick="togglePin('${card.id}', ${card.deckIndex}, ${card.cardIndex})">
-                    <div class="w-full rounded-lg bg-gray-100 dark:bg-gray-700 border-black border-4 flex items-center justify-center text-gray-600 dark:text-gray-400 overflow-hidden relative" 
-                         style="aspect-ratio: 10/16;">
+                    <div class="w-full rounded-lg bg-gray-100 border-black border-4 flex items-center justify-center text-gray-600 overflow-hidden relative" >
                         <img src="${card.imagePath}" alt="${card.displayName}" 
                              class="w-full h-full object-cover"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm" style="display: none;">
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm" style="display: none;">
                             ${card.displayName}
                         </div>
-                        <button class="absolute top-3 right-3 w-8 h-8 rounded-full text-white bg-red-600 hover:bg-red-700 text-sm flex items-center justify-center z-10 transition-colors duration-200" 
+                        <button class="absolute top-[-6px] right-[-6px] w-8 h-8 rounded-md text-white bg-black hover:bg-gray-700 text-sm flex items-center justify-center z-10 transition-colors duration-200" 
                                 onclick="event.stopPropagation(); togglePin('${card.id}', ${card.deckIndex}, ${card.cardIndex})">
-                            <i class="fas fa-times"></i>
+                            <i class="fas fa-times mt-1 mr-1"></i>
                         </button>
                     </div>
                 </div>
             `).join('');
             container.innerHTML = cardsHTML;
+            // Initialize tilt for newly created pinned cards
+            initTiltForPinnedCards();
         }
         // Update pinned count
         function updatePinnedCount() {
             document.getElementById('pinnedCount').textContent = pinnedCards.length;
         }
         // Toggle drawer
-        function toggleDrawer() {
+        window.toggleDrawer = function() {
             const drawer = document.getElementById('drawer');
             const button = drawer.querySelector('button i');
             const isOpen = drawer.style.transform === 'translateY(0px)';
@@ -693,14 +1026,14 @@
             button.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         }
         // Open info modal
-        function openInfoModal() {
+        window.openInfoModal = function() {
             document.getElementById('infoModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
         }
         // Close info modal
-        function closeInfoModal() {
+        window.closeInfoModal = function() {
             document.getElementById('infoModal').classList.add('hidden');
-            document.body.style.overflow = 'auto'; // Restore scrolling
+            document.body.style.overflow = 'auto';
         }
         // Close modal on Escape key
         document.addEventListener('keydown', function(event) {
@@ -708,14 +1041,32 @@
                 closeInfoModal();
             }
         });
-        // Listen for system dark mode changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            // Only auto-update if user hasn't manually set a preference
-            if (!localStorage.getItem('darkMode')) {
-                darkMode = e.matches;
-                applyDarkMode();
+        // Handle window resize to recheck desktop status
+        window.addEventListener('resize', function() {
+            const wasDesktop = isDesktop;
+            checkIfDesktop();
+            // If status changed, reinitialize or destroy tilt effects
+            if (wasDesktop !== isDesktop) {
+                if (isDesktop) {
+                    initTiltForCards();
+                    initTiltForPinnedCards();
+                } else {
+                    // Destroy all tilt instances on mobile
+                    destroyTiltForCards('[id^="card-"]');
+                    destroyTiltForCards('#pinnedCards > div[onclick]');
+                }
             }
         });
+        function attachHoverEffectToScenarioCards() {
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.addEventListener('mouseover', function() {
+                    this.style.transform = `translateY(-2px) rotate(${Math.random() * 2 - 1}deg)`;
+                });
+                card.addEventListener('mouseout', function() {
+                    this.style.transform = 'translateY(0) rotate(0deg)';
+                });
+            });
+        }
         // Initialize
         document.addEventListener('DOMContentLoaded', init);
     </script>
